@@ -70,66 +70,6 @@ class WeatherHomeViewController {
     _getForecastByCoordinatesCommand = GetForecastByCoordinatesCommand(
       _weatherFacade,
     );
-
-    // Observar mudanças nos comandos de clima e previsão
-    effect(() {
-      final result = _getCurrentWeatherCommand.result.value;
-
-      if (result == null) return;
-
-      result.fold(
-        onSuccess: (whether) {
-          _currentWeather.value = whether;
-          _clearError();
-        },
-        onFailure: (error) {
-          _setError(error.msg);
-
-          if (_currentWeather.value == null) {
-            _currentWeather.value = WeatherData.getCurrentWeather();
-          }
-          if (_forecast.value.isEmpty) {
-            _forecast.value = WeatherData.getForecast();
-          }
-        },
-      );
-    });
-
-    effect(() {
-      if (_getForecastCommand.isSuccess.value) {
-        _forecast.value =
-            _getForecastCommand.result.value?.successValueOrNull ?? [];
-        _clearError();
-      }
-    });
-
-    effect(() {
-      if (_getWeatherByCoordinatesCommand.isSuccess.value) {
-        _currentWeather.value =
-            _getWeatherByCoordinatesCommand.result.value?.successValueOrNull;
-        _clearError();
-      }
-    });
-
-    effect(() {
-      if (_getForecastByCoordinatesCommand.isSuccess.value) {
-        _forecast.value =
-            _getForecastByCoordinatesCommand.result.value?.successValueOrNull ??
-            [];
-        _clearError();
-      }
-    });
-    effect(() {
-      if (_getCompleteWeatherCommand.isSuccess.value) {
-        final data =
-            _getCompleteWeatherCommand.result.value?.successValueOrNull;
-        
-        _currentWeather.value = data?.$1;
-        _forecast.value = data!.$2;
-        
-        _clearError();
-      }
-    });
   }
 
   // Inicializar com dados mock
@@ -148,7 +88,20 @@ class WeatherHomeViewController {
 
     //_searchQuery.value = cityName.trim();
     _clearError();
-    await _getCompleteWeatherCommand.executeWith((cityName: cityName.trim()));
+
+    final result = await _getCompleteWeatherCommand.executeWith((
+      cityName: cityName.trim(),
+    ));
+
+    result.fold(
+      onSuccess: (data) {
+        _currentWeather.value = data.$1;
+        _forecast.value = data.$2;
+      },
+      onFailure: (error) {
+        _setError(error.msg);
+      },
+    );
 
     // await _getCurrentWeatherCommand.executeWith((cityName: cityName.trim()));
     // await _getForecastCommand.executeWith((cityName: cityName.trim()));
@@ -163,11 +116,12 @@ class WeatherHomeViewController {
   void _setError(String message) {
     _errorMessage.value = message;
   }
-   // Limpar busca
+
+  // Limpar busca
   void clearSearch() {
     _clearError();
     _initializeData();
-    
+
     // Limpar comandos
     _getCurrentWeatherCommand.clear();
     _getForecastCommand.clear();
@@ -175,7 +129,8 @@ class WeatherHomeViewController {
     _getForecastByCoordinatesCommand.clear();
     _getCompleteWeatherCommand.clear();
   }
-    // Dispose resources
+
+  // Dispose resources
   void dispose() {
     _getCurrentWeatherCommand.reset();
     _getForecastCommand.reset();

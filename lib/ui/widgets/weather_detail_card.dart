@@ -3,11 +3,8 @@ import 'package:weather_app/domain/models/weather.dart';
 
 class WeatherDetailsCard extends StatelessWidget {
   final Weather weather;
-  
-  const WeatherDetailsCard({
-    super.key,
-    required this.weather,
-  });
+
+  const WeatherDetailsCard({super.key, required this.weather});
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +27,9 @@ class WeatherDetailsCard extends StatelessWidget {
         children: [
           Text(
             "Detalhes do Clima",
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
           Row(
@@ -92,16 +89,14 @@ class WeatherDetailsCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              size: 16,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            Icon(icon, size: 16, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 6),
             Text(
               title,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -109,9 +104,9 @@ class WeatherDetailsCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );

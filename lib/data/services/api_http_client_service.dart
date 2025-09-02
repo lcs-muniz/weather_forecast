@@ -15,8 +15,8 @@ class ApiHttpClientService {
       
       // TODO: Remover Future.delayed e _mockResponse() após testes
       // usando mock provisioriamente
-      Future.delayed(Duration(seconds: 5));
-      return _mockResponse();
+      //Future.delayed(Duration(seconds: 5));
+      //return _mockResponse();
 
       final response = await http
           .get(
@@ -82,7 +82,7 @@ class ApiHttpClientService {
     }
   }
 
-  static Map<String, dynamic> _mockResponse() {
+  /* static Map<String, dynamic> _mockResponse() {
     const jsonString = '''
       {
         "name": "Futsal City",
@@ -180,5 +180,5 @@ class ApiHttpClientService {
       }
       ''';
     return json.decode(jsonString);
-  }
+  } */
 }

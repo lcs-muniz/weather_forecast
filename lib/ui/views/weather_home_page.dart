@@ -65,6 +65,11 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
           onRefresh: () async {
             // Aqui você pode chamar o método de atualização de dados
             // Exemplo: await _weatherController.refreshWeatherData();
+            if (_viewController.currentWeather.value != null) {
+              await _viewController.searchWeatherByCity(
+                _viewController.currentWeather.value!.cityName,
+              );
+            }
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
