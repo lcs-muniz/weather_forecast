@@ -54,7 +54,7 @@ class WeatherHomeViewController {
   );
   // Construtor
   WeatherHomeViewController({required IWeatherUseCasesFacade weatherFacade})
-    : _weatherFacade = weatherFacade {
+      : _weatherFacade = weatherFacade {
     _initializeCommands();
     _initializeData();
   }
@@ -74,8 +74,6 @@ class WeatherHomeViewController {
 
   // Inicializar com dados mock
   void _initializeData() {
-    _currentWeather.value = WeatherData.getCurrentWeather();
-    _forecast.value = WeatherData.getForecast();
     _isInitialized.value = true;
   }
 
@@ -89,9 +87,8 @@ class WeatherHomeViewController {
     //_searchQuery.value = cityName.trim();
     _clearError();
 
-    final result = await _getCompleteWeatherCommand.executeWith((
-      cityName: cityName.trim(),
-    ));
+    final result = await _getCompleteWeatherCommand
+        .executeWith((cityName: cityName.trim(),));
 
     result.fold(
       onSuccess: (data) {
