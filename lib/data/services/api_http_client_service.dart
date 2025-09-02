@@ -12,24 +12,23 @@ class ApiHttpClientService {
     Map<String, String>? headers,
   }) async {
     try {
-      
       // TODO: Remover Future.delayed e _mockResponse() após testes
       // usando mock provisioriamente
       //Future.delayed(Duration(seconds: 5));
       //return _mockResponse();
 
-      final response = await http
-          .get(
-            Uri.parse(url),
-            headers: {'Content-Type': 'application/json', ...?headers},
-          )
-          .timeout(_timeout);
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json', ...?headers},
+      ).timeout(_timeout);
 
       return _handleResponse(response);
     } on SocketException {
       throw ApiException('Sem conexão com a internet');
     } on HttpException {
       throw ApiException('Erro na requisição HTTP');
+    } on RecordNotFound {
+      rethrow;
     } catch (e) {
       throw ApiException('Erro inesperado: $e');
     }
@@ -55,6 +54,8 @@ class ApiHttpClientService {
       throw ApiException('Sem conexão com a internet');
     } on HttpException {
       throw ApiException('Erro na requisição HTTP');
+    } on RecordNotFound {
+      throw RecordNotFound();
     } catch (e) {
       throw ApiException('Erro inesperado: $e');
     }
@@ -73,7 +74,7 @@ class ApiHttpClientService {
         case 403:
           throw ApiException('Acesso negado');
         case 404:
-          throw ApiException('Recurso não encontrado');
+          throw RecordNotFound('Recurso não encontrado');
         case 500:
           throw ApiException('Erro interno do servidor');
         default:

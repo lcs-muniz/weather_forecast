@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:weather_app/core/dependencies/injection_dependencies.dart';
@@ -20,17 +21,38 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   late WeatherHomeViewController _viewController;
   // Controller para campo de busca
   final searchController = TextEditingController();
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _viewController = injector.get<WeatherHomeViewController>();
+    _startAutoRefreshTimer();
   }
 
   @override
   void dispose() {
     searchController.dispose();
+    _refreshTimer?.cancel();
     super.dispose();
+  }
+
+  void _startAutoRefreshTimer() {
+    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      if (_viewController.currentWeather.value != null) {
+        _viewController.searchWeatherByCity(
+          _viewController.currentWeather.value!.cityName,
+        );
+      }
+    });
+  }
+
+  Future<void> _handleRefresh() async {
+    if (_viewController.currentWeather.value != null) {
+      await _viewController.searchWeatherByCity(
+        _viewController.currentWeather.value!.cityName,
+      );
+    }
   }
 
   void _onSearch(String cityName) async {
@@ -62,15 +84,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       body: SafeArea(
         // use refresh indicator para permitir que o usuário atualize os dados puxando para baixo
         child: RefreshIndicator(
-          onRefresh: () async {
-            // Aqui você pode chamar o método de atualização de dados
-            // Exemplo: await _weatherController.refreshWeatherData();
-            if (_viewController.currentWeather.value != null) {
-              await _viewController.searchWeatherByCity(
-                _viewController.currentWeather.value!.cityName,
-              );
-            }
-          },
+          onRefresh: _handleRefresh,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
@@ -82,46 +96,42 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                   isLoading: _viewController.isLoadingWeather,
                 ),
                 Watch(
-                  (_) =>
-                      _viewController.errorMessage.value != null
-                          ? ErrorContainer(
-                            onRetry: () {},
-                            errorMessage: _viewController.errorMessage.value!,
-                          )
-                          : const SizedBox.shrink(),
+                  (_) => _viewController.errorMessage.value != null
+                      ? ErrorContainer(
+                          onRetry: _handleRefresh,
+                          errorMessage: _viewController.errorMessage.value!,
+                        )
+                      : const SizedBox.shrink(),
                 ),
                 //CurrentWeatherCard(weather: WeatherData.getCurrentWeather()),
                 // Clima atual
                 Watch(
-                  (_) =>
-                      _viewController.currentWeather.value != null
-                          ? CurrentWeatherCard(
-                            weather: _viewController.currentWeather.value!,
-                          )
-                          : const SizedBox.shrink(),
+                  (_) => _viewController.currentWeather.value != null
+                      ? CurrentWeatherCard(
+                          weather: _viewController.currentWeather.value!,
+                        )
+                      : const SizedBox.shrink(),
                 ),
                 const SizedBox(height: 16),
                 // WeatherDetailsCard(weather: WeatherData.getCurrentWeather()),
                 // Detalhes do clima
                 Watch(
-                  (_) =>
-                      _viewController.currentWeather.value != null 
-                          ? WeatherDetailsCard(
-                            weather: _viewController.currentWeather.value!,
-                          )
-                          : const SizedBox.shrink(),
+                  (_) => _viewController.currentWeather.value != null
+                      ? WeatherDetailsCard(
+                          weather: _viewController.currentWeather.value!,
+                        )
+                      : const SizedBox.shrink(),
                 ),
 
                 const SizedBox(height: 16),
                 // ForecastList(forecasts: WeatherData.getForecast()),
                 // Lista de previsão
                 Watch(
-                  (_) =>
-                      _viewController.forecast.value.isNotEmpty 
-                          ? ForecastList(
-                            forecasts: _viewController.forecast.value,
-                          )
-                          : const SizedBox.shrink(),
+                  (_) => _viewController.forecast.value.isNotEmpty
+                      ? ForecastList(
+                          forecasts: _viewController.forecast.value,
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),

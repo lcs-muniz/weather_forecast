@@ -8,6 +8,10 @@ sealed class Failure implements Exception {
   String toString() => '$runtimeType: $msg!!!';
 }
 
+class CityNotFound extends Failure {
+  CityNotFound([super.msg = MessagesError.cityNotFound]);
+}
+
 class DefaultError extends Failure {
   DefaultError([super.msg = MessagesError.defaultError]);
 }

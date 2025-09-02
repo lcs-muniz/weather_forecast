@@ -31,4 +31,5 @@ abstract class MessagesError {
   static const recordNotFound = 'Registro Não Encontrado!!!';
   static const recordInvalidFormat = 'Registro Em Formato Inválido!!!';
   static const emptySearch = 'Sem Dados Para a Consulta Desejada!!!';
+  static const cityNotFound = 'A cidade informada não foi encontrada!!! Verifique o nome e tente novamente.';
 }

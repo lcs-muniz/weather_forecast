@@ -16,6 +16,8 @@ class WeatherApiService implements IWeatherService {
 
       final weather = Weather.fromJson(data);
       return Success(weather);
+    } on RecordNotFound {
+      return Error(CityNotFound());
     } on ApiException catch (e) {
       return Error(ApiException(e.msg));
     } catch (e) {
@@ -31,14 +33,15 @@ class WeatherApiService implements IWeatherService {
       final data = await ApiHttpClientService.get(url);
 
       final List<dynamic> forecastList = data['list'];
-      final forecast =
-          forecastList
-              .where((item) => _isDailyForecast(item['dt_txt']))
-              .take(5)
-              .map((item) => WeatherForecast.fromJson(item))
-              .toList();
+      final forecast = forecastList
+          .where((item) => _isDailyForecast(item['dt_txt']))
+          .take(5)
+          .map((item) => WeatherForecast.fromJson(item))
+          .toList();
 
       return Success(forecast);
+    } on RecordNotFound {
+      return Error(CityNotFound());
     } on ApiException catch (e) {
       return Error(ApiException(e.msg));
     } catch (e) {
@@ -73,12 +76,11 @@ class WeatherApiService implements IWeatherService {
       final data = await ApiHttpClientService.get(url);
 
       final List<dynamic> forecastList = data['list'];
-      final forecast =
-          forecastList
-              .where((item) => _isDailyForecast(item['dt_txt']))
-              .take(5)
-              .map((item) => WeatherForecast.fromJson(item))
-              .toList();
+      final forecast = forecastList
+          .where((item) => _isDailyForecast(item['dt_txt']))
+          .take(5)
+          .map((item) => WeatherForecast.fromJson(item))
+          .toList();
 
       return Success(forecast);
     } on ApiException catch (e) {
